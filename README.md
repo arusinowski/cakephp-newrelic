@@ -14,7 +14,7 @@ You can modify your files like this to have full NewRelic support.
 
 ## Installation
 
-Note: This branch is for CakePHP 4.x
+Note: This branch is for CakePHP 5.x
 
 ```
 composer require jippi/cakephp-newrelic:dev-cake4

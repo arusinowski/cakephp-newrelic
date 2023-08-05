@@ -1,6 +1,6 @@
 {
   "name": "jippi/cakephp-newrelic",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "CakePHP <3 NewRelic",
   "type": "cakephp-plugin",
   "keywords": [
@@ -24,14 +24,15 @@
     "irc": "irc://irc.freenode.org/friendsofcake"
   },
   "require": {
-    "cakephp/cakephp": "^4.0"
+    "php": ">=8.1",
+    "cakephp/cakephp": "5.x-dev"
   },
   "require-dev": {
-    "phpunit/phpunit": "*",
-    "cakephp/cakephp-codesniffer": "^4.0",
-    "phpstan/phpstan": "^0.12.18",
-    "psalm/phar": "~3.11.2"
+    "phpunit/phpunit": "^10.1.0",
+    "cakephp/cakephp-codesniffer": "^5.0"
   },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "autoload": {
     "psr-4": {
       "NewRelic\\": "src",
@@ -46,5 +47,10 @@
   },
   "extra": {
     "installer-name": "NewRelic"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }

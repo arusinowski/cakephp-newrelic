@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace NewRelic\Controller\Component;
 
 use Cake\Controller\Component;
-use Cake\Event\Event;
+use Cake\Event\EventInterface;
 use NewRelic\Traits\NewRelicTrait;
 
 /**
@@ -14,7 +14,6 @@ use NewRelic\Traits\NewRelicTrait;
  */
 class NewRelicComponent extends Component
 {
-
 	use NewRelicTrait;
 
 	/**
@@ -22,11 +21,11 @@ class NewRelicComponent extends Component
 	 *
 	 * Start NewRelic and configure transaction name
 	 *
-	 * @param Event $event
+	 * @param \Cake\Event\EventInterface $event
 	 * @return void
 	 */
-	public function beforeFilter(Event $event)
-	{
+	public function beforeFilter(EventInterface $event): void
+    {
 		$this->setName($event->getSubject()->getRequest());
 		$this->start();
 

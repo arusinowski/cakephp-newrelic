@@ -14,24 +14,23 @@ use Throwable;
  */
 class NewRelic
 {
+    protected static array $ignoredExceptions = [];
 
-    protected static $ignoredExceptions = [];
+    protected static array $ignoredErrors = [];
 
-    protected static $ignoredErrors = [];
+    protected static array $serverVariables = [];
 
-    protected static $serverVariables = [];
+    protected static array $cookieVariables = [];
 
-    protected static $cookieVariables = [];
-
-    protected static $currentTransactionName;
+    protected static string $currentTransactionName;
 
     /**
      * Change the application name
      *
-     * @param  string $name
+     * @param string $name
      * @return void
      */
-    public static function applicationName($name)
+    public static function applicationName(string $name): void
     {
         if (!static::hasNewRelic()) {
             return;
@@ -43,10 +42,10 @@ class NewRelic
     /**
      * Start a New Relic transaction
      *
-     * @param  string $name
+     * @param string|null $name
      * @return void
      */
-    public static function start($name = null)
+    public static function start(?string $name = null): void
     {
         if (!static::hasNewRelic()) {
             return;
@@ -64,10 +63,10 @@ class NewRelic
     /**
      * End a New Relic transaction
      *
-     * @param  boolean $ignore Should the statistics NewRelic gathered be discarded?
+     * @param boolean $ignore Should the statistics NewRelic gathered be discarded?
      * @return void
      */
-    public static function stop($ignore = false)
+    public static function stop(bool $ignore = false): void
     {
         if (!static::hasNewRelic()) {
             return;
@@ -81,7 +80,7 @@ class NewRelic
      *
      * @return void
      */
-    public static function ignoreTransaction()
+    public static function ignoreTransaction(): void
     {
         if (!static::hasNewRelic()) {
             return;
@@ -95,7 +94,7 @@ class NewRelic
      *
      * @return void
      */
-    public static function ignoreApdex()
+    public static function ignoreApdex(): void
     {
         if (!static::hasNewRelic()) {
             return;
@@ -107,10 +106,10 @@ class NewRelic
     /**
      * Should NewRelic capture params ?
      *
-     * @param  boolean $boolean
+     * @param boolean $boolean
      * @return void
      */
-    public static function captureParams($boolean)
+    public static function captureParams(bool $boolean): void
     {
         if (!static::hasNewRelic()) {
             return;
@@ -124,7 +123,7 @@ class NewRelic
      *
      * @param string $method
      */
-    public static function addTracer($method)
+    public static function addTracer(string $method): void
     {
         if (!static::hasNewRelic()) {
             return;
@@ -138,8 +137,9 @@ class NewRelic
      *
      * @param string $key
      * @param mixed $value
+     * @return false|void
      */
-    public static function parameter($key, $value)
+    public static function parameter(string $key, mixed $value)
     {
         if (!static::hasNewRelic()) {
             return false;
@@ -155,18 +155,19 @@ class NewRelic
     /**
      * Track a custom metric
      *
-     * @param  string $key
-     * @param  integer|float $value
-     * @return void|\Exception
+     * @param string $key
+     * @param float|integer $value
+     * @return void
+     * @throws \Exception
      */
-    public static function metric($key, $value)
+    public static function metric(string $key, float|int $value): void
     {
         if (!static::hasNewRelic()) {
             return;
         }
 
         if (!is_numeric($value)) {
-            throw new \Exception('Value must be numeric');
+            throw new Exception('Value must be numeric');
         }
 
         newrelic_custom_metric($key, $value);
@@ -175,10 +176,10 @@ class NewRelic
     /**
      * Add a custom method to have traced by NewRelic
      *
-     * @param  string $method
+     * @param string $method
      * @return void
      */
-    public static function tracer($method)
+    public static function tracer(string $method): void
     {
         if (!static::hasNewRelic()) {
             return;
@@ -190,10 +191,10 @@ class NewRelic
     /**
      * Ignore an exception class
      *
-     * @param  string $exception
+     * @param string $exception
      * @return void
      */
-    public static function ignoreException($exception)
+    public static function ignoreException(string $exception): void
     {
         static::$ignoredExceptions = array_merge(static::$ignoredExceptions, (array) $exception);
     }
@@ -201,10 +202,10 @@ class NewRelic
     /**
      * Ignore error strings
      *
-     * @param  string $error
+     * @param string $error
      * @return void
      */
-    public static function ignoreError($error)
+    public static function ignoreError(string $error): void
     {
         static::$ignoredErrors = array_merge(static::$ignoredErrors, (array) $error);
     }
@@ -215,9 +216,9 @@ class NewRelic
      * @param  array $variables
      * @return void
      */
-    public static function collectServerVariables(array $variables)
+    public static function collectServerVariables(array $variables): void
     {
-        static::$serverVariables = array_merge(static::$serverVariables, (array) $variables);
+        static::$serverVariables = array_merge(static::$serverVariables, $variables);
     }
 
     /**
@@ -226,18 +227,18 @@ class NewRelic
      * @param  array $variables
      * @return void
      */
-    public static function collectCookieVariables(array $variables)
+    public static function collectCookieVariables(array $variables): void
     {
-        static::$cookieVariables = array_merge(static::$cookieVariables, (array) $variables);
+        static::$cookieVariables = array_merge(static::$cookieVariables, $variables);
     }
 
     /**
      * Send an exception to New Relic
      *
-     * @param  Exception|Throwable $exception
+     * @param \Throwable|\Exception $exception
      * @return void
      */
-    public static function sendException($exception)
+    public static function sendException(Throwable|Exception $exception): void
     {
         if (!static::hasNewRelic()) {
             return;
@@ -248,7 +249,7 @@ class NewRelic
             return;
         }
 
-        newrelic_notice_error(null, $exception);
+        newrelic_notice_error(0, $exception);
     }
 
     /**
@@ -258,17 +259,22 @@ class NewRelic
      * @param mixed $description
      * @param mixed $file
      * @param mixed $line
-     * @param mixed $context
+     * @param mixed|null $context
      * @return void
      */
-    public static function sendError($code, $description, $file, $line, $context = null)
-    {
+    public static function sendError(
+        mixed $code,
+        mixed $description,
+        mixed $file,
+        mixed $line,
+        mixed $context = null
+    ): void {
         if (!static::hasNewRelic()) {
             return;
         }
 
         foreach (static::$ignoredErrors as $errorMessage) {
-            if (false !== strpos($description, $errorMessage)) {
+            if (str_contains($description, $errorMessage)) {
                 return;
             }
         }
@@ -279,12 +285,12 @@ class NewRelic
     /**
      * Set user attributes
      *
-     * @param  string $user
-     * @param  string $account
-     * @param  string $product
+     * @param string $user
+     * @param string $account
+     * @param string $product
      * @return void
      */
-    public static function user($user, $account, $product)
+    public static function user(string $user, string $account, string $product): void
     {
         if (!static::hasNewRelic()) {
             return;
@@ -298,7 +304,7 @@ class NewRelic
      *
      * @return boolean
      */
-    public static function hasNewRelic()
+    public static function hasNewRelic(): bool
     {
         return extension_loaded('newrelic');
     }
@@ -308,7 +314,7 @@ class NewRelic
      *
      * @return void
      */
-    public static function collect()
+    public static function collect(): void
     {
         static::parameter('_get', $_GET);
         static::parameter('_post', $_POST);
